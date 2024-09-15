@@ -1,0 +1,77 @@
+from fastapi import FastAPI, Query, Body
+import uvicorn 
+
+app = FastAPI()
+
+hotels = [
+    {'id': 1, 'city': 'Ashgabat', 'name': 'Garagum'},
+    {'id': 2, 'city':'Dashoguz', 'name': 'Mizan'}
+]
+
+
+@app.get('/hotels')
+def read_root(
+    id: str | None = Query(None, description='Hotels id'),
+    title: str | None = Query(None, description='Hotels name')
+    ):
+    get_hotel = []
+    for hotel in hotels:
+        if id and hotel[id] != id:
+            continue
+        if title and hotel[title] != title:
+            continue
+        get_hotel.append(hotel)
+    return get_hotel
+
+
+@app.delete('/hotels/{hotel_id}')
+def delete_hotel(hotel_id: int):
+    global hotels
+    hotels = [hotel for hotel in hotels if hotel['id'] != hotel_id]
+    return {'status': 'OK'}
+
+
+@app.post('/hotels/')
+def create_hotel(title: str = Body(embed=True)):
+    global hotels
+    hotels.append(
+        {
+            'id': hotels[-1]['id'] + 1,
+            'title': title
+        }
+    )
+    return {'status': 'Successfully posted'}
+
+
+@app.put('/hotels/{hotel_id}')
+def put_hotel(
+    hotel_id: int,
+    city: str = Body(description='Hotels city'), 
+    name: str = Body(description='Hotels name')
+    ):
+    global hotels
+    for hotel in hotels:
+        if hotel['id'] == hotel_id:
+            hotel['city'] = city
+            hotel['name'] = name
+    return {'status': 'Succesfully modified'}
+
+
+@app.patch('/hotels/{hotel_id}')
+def patch_hotel(
+    hotel_id: int,
+    city: str | None = Body(None, description='Hotels City'),
+    name: str | None = Body(None, description='Hotels Name')
+    ):
+    global hotels
+    for hotel in hotels:
+        if hotel['id'] == hotel_id:
+            hotel['city'] = city if city != None else hotel['city']
+            hotel['name'] = name if name != None else hotel['name']
+    return {'status': 'Successfully modified'}
+            
+
+
+
+if __name__ == '__main__':
+    uvicorn.run('main:app', reload=True)
