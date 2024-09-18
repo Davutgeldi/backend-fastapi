@@ -10,7 +10,9 @@ hotels = [
 ]
 
 
-@router.get('')
+@router.get('', summary='Get query', 
+            description='<h2>use it if u wanna take list of hotels</h2>'
+            )
 def read_root(
     id: str | None = Query(None, description='Hotels id'),
     title: str | None = Query(None, description='Hotels name')
