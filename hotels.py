@@ -1,5 +1,7 @@
 from fastapi import Query, Body, APIRouter
 
+from schemas.hotels import Hotel, HotelPATCH
+
 
 router = APIRouter(prefix='/hotels', tags=['Hotels'])
 
@@ -35,43 +37,39 @@ def delete_hotel(hotel_id: int):
 
 
 @router.post('')
-def create_hotel(title: str = Body(embed=True)):
+def create_hotel(hotel_data: Hotel = Body(openapi_examples={
+    '1': {'summary': 'Russia', 'value': {'city': 'Sochi', 'name': 'Balkan'}},
+    '2': {'summary': 'USA', 'value': {'city': 'Florida', 'name': 'Miami Beach'}}
+})):
     global hotels
     hotels.append(
         {
             'id': hotels[-1]['id'] + 1,
-            'title': title
+            'title': hotel_data.city,
+            'name': hotel_data.name
         }
     )
     return {'status': 'Successfully posted'}
 
 
 @router.put('/{hotel_id}')
-def put_hotel(
-    hotel_id: int,
-    city: str = Body(description='Hotels city'), 
-    name: str = Body(description='Hotels name')
-    ):
+def put_hotel(hotel_id: int, hotel_data: Hotel):
     global hotels
     for hotel in hotels:
         if hotel['id'] == hotel_id:
-            hotel['city'] = city
-            hotel['name'] = name
+            hotel['city'] = hotel_data.city
+            hotel['name'] = hotel_data.name
     return {'status': 'Succesfully modified'}
 
 
 @router.patch('/{hotel_id}') 
 # Can add attribute summary and description, 
 # change name of endpoint and give description 
-def patch_hotel(
-    hotel_id: int,
-    city: str | None = Body(None, description='Hotels City'),
-    name: str | None = Body(None, description='Hotels Name')
-    ):
+def patch_hotel(hotel_id: int, hotel_data: HotelPATCH):
     global hotels
     for hotel in hotels:
         if hotel['id'] == hotel_id:
-            hotel['city'] = city if city != None else hotel['city']
-            hotel['name'] = name if name != None else hotel['name']
+            hotel['city'] = hotel_data.city if hotel_data.city != None else hotel['city']
+            hotel['name'] = hotel_data.name if hotel_data.name != None else hotel['name']
     return {'status': 'Successfully modified'}
             
