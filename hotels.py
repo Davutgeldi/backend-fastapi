@@ -8,7 +8,12 @@ router = APIRouter(prefix='/hotels', tags=['Hotels'])
 
 hotels = [
     {'id': 1, 'city': 'Ashgabat', 'name': 'Garagum'},
-    {'id': 2, 'city':'Dashoguz', 'name': 'Mizan'}
+    {'id': 2, 'city':'Dashoguz', 'name': 'Mizan'},
+    {'id': 3, 'city':'Lebap', 'name': 'Yelken'},
+    {'id': 4, 'city':'Anev', 'name': 'Watancy'},
+    {'id': 5, 'city':'Mary', 'name': 'Gami'},
+    {'id': 6, 'city':'Balkan', 'name': 'Hazar'},
+    {'id': 7, 'city':'Cheleken', 'name': 'Archabil'},
 ]
 
 
@@ -17,17 +22,11 @@ hotels = [
             )
 def read_root(
     id: str | None = Query(None, description='Hotels id'),
-    title: str | None = Query(None, description='Hotels name')
+    title: str | None = Query(None, description='Hotels name'),
+    page: int = 1,
+    per_page: int = 5
     ):
-    get_hotel = []
-    for hotel in hotels:
-        if id and hotel[id] != id:
-            continue
-        if title and hotel[title] != title:
-            continue
-        get_hotel.append(hotel)
-    return get_hotel
-
+    return hotels[page - 1: per_page]
 
 @router.delete('/{hotel_id}')
 def delete_hotel(hotel_id: int):
