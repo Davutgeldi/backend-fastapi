@@ -23,10 +23,13 @@ hotels = [
 def read_root(
     id: str | None = Query(None, description='Hotels id'),
     title: str | None = Query(None, description='Hotels name'),
-    page: int = 1,
-    per_page: int = 5
+    page: int | None = Query(None, ge=1),
+    per_page: int | None = Query(None, ge=1, lt=15)
     ):
-    return hotels[page - 1: per_page]
+    if page and per_page:    
+        return hotels[(page - 1) * per_page:][:per_page]
+    return hotels
+
 
 @router.delete('/{hotel_id}')
 def delete_hotel(hotel_id: int):
