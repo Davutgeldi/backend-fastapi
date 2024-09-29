@@ -1,6 +1,6 @@
 from fastapi import Query, Body, APIRouter
 
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 
 from schemas.hotels import Hotel, HotelPATCH
 from src.api.dependencies import PaginationDep
@@ -11,28 +11,22 @@ from src.database import engine
 router = APIRouter(prefix='/hotels', tags=['Hotels'])
 
 
-hotels = [
-    {'id': 1, 'city': 'Ashgabat', 'name': 'Garagum'},
-    {'id': 2, 'city':'Dashoguz', 'name': 'Mizan'},
-    {'id': 3, 'city':'Lebap', 'name': 'Yelken'},
-    {'id': 4, 'city':'Anev', 'name': 'Watancy'},
-    {'id': 5, 'city':'Mary', 'name': 'Gami'},
-    {'id': 6, 'city':'Balkan', 'name': 'Hazar'},
-    {'id': 7, 'city':'Cheleken', 'name': 'Archabil'},
-]
-
-
 @router.get('', summary='Get query', 
             description='<h2>use it if u wanna take list of hotels</h2>'
             )
-def read_root(
+async def read_root(
     pagination: PaginationDep,
     id: str | None = Query(None, description='Hotels id'),
     title: str | None = Query(None, description='Hotels name'),
     ):
-    if pagination.page and pagination.per_page:    
-        return hotels[(pagination.page - 1) * pagination.per_page:][:pagination.per_page]
-    return hotels
+    async with async_session() as session:
+        query = select(HotelsOrm)
+        result = await session.execute(query)
+        hotels = result.scalars().all()
+        return hotels
+    # if pagination.page and pagination.per_page:    
+    #     return hotels[(pagination.page - 1) * pagination.per_page:][:pagination.per_page]
+    
 
 
 @router.delete('/{hotel_id}')
