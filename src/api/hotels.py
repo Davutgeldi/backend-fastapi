@@ -17,10 +17,21 @@ router = APIRouter(prefix='/hotels', tags=['Hotels'])
 async def read_root(
     pagination: PaginationDep,
     id: str | None = Query(None, description='Hotels id'),
-    title: str | None = Query(None, description='Hotels name'),
+    city: str | None = Query(None, description='Hotels city'),
+    name: str | None = Query(None, description='Hotels name')
     ):
+    per_page = pagination.per_page or 3
     async with async_session() as session:
         query = select(HotelsOrm)
+        if city:
+            query = query.filter_by(city=city)
+        if name: 
+            query = query.filter_by(name=name)
+        query = (
+            query
+            .limit(per_page)
+            .offset(offset = (pagination.page - 1) * per_page)
+        )
         result = await session.execute(query)
         hotels = result.scalars().all()
         return hotels
