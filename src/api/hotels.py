@@ -1,6 +1,6 @@
 from fastapi import Query, Body, APIRouter
 
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, func
 
 from schemas.hotels import Hotel, HotelPATCH
 from src.api.dependencies import PaginationDep
@@ -24,14 +24,15 @@ async def read_root(
     async with async_session() as session:
         query = select(HotelsOrm)
         if city:
-            query = query.filter_by(city=city)
+            query = query.filter(func.lower(HotelsOrm.city).contains(city.lower()))
         if name: 
-            query = query.filter_by(name=name)
+            query = query.filter(func.lower(HotelsOrm.name).contains(name.lower()))
         query = (
             query
             .limit(per_page)
             .offset(offset = (pagination.page - 1) * per_page)
         )
+        print(query.compile(compile_kwargs={'literal_binds': True}))
         result = await session.execute(query)
         hotels = result.scalars().all()
         return hotels
