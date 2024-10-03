@@ -7,6 +7,7 @@ from src.api.dependencies import PaginationDep
 from src.database import async_session
 from src.models.hotels import HotelsOrm
 from src.database import engine
+from src.repositories.hotels import HotelRepository 
 
 router = APIRouter(prefix='/hotels', tags=['Hotels'])
 
@@ -20,22 +21,24 @@ async def read_root(
     city: str | None = Query(None, description='Hotels city'),
     name: str | None = Query(None, description='Hotels name')
     ):
-    per_page = pagination.per_page or 3
     async with async_session() as session:
-        query = select(HotelsOrm)
-        if city:
-            query = query.filter(func.lower(HotelsOrm.city).contains(city.lower()))
-        if name: 
-            query = query.filter(func.lower(HotelsOrm.name).contains(name.lower()))
-        query = (
-            query
-            .limit(per_page)
-            .offset(offset = (pagination.page - 1) * per_page)
-        )
-        print(query.compile(compile_kwargs={'literal_binds': True}))
-        result = await session.execute(query)
-        hotels = result.scalars().all()
-        return hotels
+        return await HotelRepository(session).get_all(HotelsOrm)
+    # per_page = pagination.per_page or 3
+    # async with async_session() as session:
+    #     query = select(HotelsOrm)
+    #     if city:
+    #         query = query.filter(func.lower(HotelsOrm.city).contains(city.lower()))
+    #     if name: 
+    #         query = query.filter(func.lower(HotelsOrm.name).contains(name.lower()))
+    #     query = (
+    #         query
+    #         .limit(per_page)
+    #         .offset(offset = (pagination.page - 1) * per_page)
+    #     )
+    #     print(query.compile(compile_kwargs={'literal_binds': True}))
+    #     result = await session.execute(query)
+    #     hotels = result.scalars().all()
+    #     return hotels
     # if pagination.page and pagination.per_page:    
     #     return hotels[(pagination.page - 1) * pagination.per_page:][:pagination.per_page]
     
