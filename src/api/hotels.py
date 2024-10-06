@@ -13,7 +13,7 @@ router = APIRouter(prefix='/hotels', tags=['Hotels'])
 
 
 @router.get('', summary='Get query', 
-            description='<h2>use it if u wanna take list of hotels</h2>'
+            description='<h2>Use it if u wanna take list of hotels</h2>'
             )
 async def read_root(
     pagination: PaginationDep,
@@ -21,27 +21,13 @@ async def read_root(
     city: str | None = Query(None, description='Hotels city'),
     name: str | None = Query(None, description='Hotels name')
     ):
+    per_page = pagination.per_page or 5
     async with async_session() as session:
-        return await HotelRepository(session).get_all(HotelsOrm)
-    # per_page = pagination.per_page or 3
-    # async with async_session() as session:
-    #     query = select(HotelsOrm)
-    #     if city:
-    #         query = query.filter(func.lower(HotelsOrm.city).contains(city.lower()))
-    #     if name: 
-    #         query = query.filter(func.lower(HotelsOrm.name).contains(name.lower()))
-    #     query = (
-    #         query
-    #         .limit(per_page)
-    #         .offset(offset = (pagination.page - 1) * per_page)
-    #     )
-    #     print(query.compile(compile_kwargs={'literal_binds': True}))
-    #     result = await session.execute(query)
-    #     hotels = result.scalars().all()
-    #     return hotels
-    # if pagination.page and pagination.per_page:    
-    #     return hotels[(pagination.page - 1) * pagination.per_page:][:pagination.per_page]
-    
+        return await HotelRepository(session).get_all( 
+            city=city, 
+            name=name, 
+            limit=per_page, 
+            offset=(pagination.page - 1) * per_page)
 
 
 @router.delete('/{hotel_id}')
