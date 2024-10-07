@@ -43,12 +43,9 @@ async def create_hotel(hotel_data: Hotel = Body(openapi_examples={
     '2': {'summary': 'USA', 'value': {'city': 'Florida', 'name': 'Miami Beach'}}
 })):
     async with async_session() as session:
-        add_hotel_stmt = insert(HotelsOrm).values(**hotel_data.model_dump())
-        # Debug, sql statement
-        #print(add_hotel_stmt.compile(compile_kwargs={engine, 'literal_binds': True}))
-        await session.execute(add_hotel_stmt)
+        hotel = await HotelRepository(session).add(hotel_data)
         await session.commit()
-    return {'status': 'Successfully posted'}
+    return {'status': 'Successfully posted', 'data': hotel}
 
 
 @router.put('/{hotel_id}')
