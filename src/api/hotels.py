@@ -30,13 +30,6 @@ async def read_root(
             offset=(pagination.page - 1) * per_page)
 
 
-@router.delete('/{hotel_id}')
-def delete_hotel(hotel_id: int):
-    global hotels
-    hotels = [hotel for hotel in hotels if hotel['id'] != hotel_id]
-    return {'status': 'OK'}
-
-
 @router.post('')
 async def create_hotel(hotel_data: Hotel = Body(openapi_examples={
     '1': {'summary': 'Russia', 'value': {'city': 'Sochi', 'name': 'Balkan'}},
@@ -49,12 +42,10 @@ async def create_hotel(hotel_data: Hotel = Body(openapi_examples={
 
 
 @router.put('/{hotel_id}')
-def put_hotel(hotel_id: int, hotel_data: Hotel):
-    global hotels
-    for hotel in hotels:
-        if hotel['id'] == hotel_id:
-            hotel['city'] = hotel_data.city
-            hotel['name'] = hotel_data.name
+async def put_hotel(hotel_id: int, hotel_data: Hotel):
+    async with async_session() as session:
+        await HotelRepository(session).edit(hotel_data, id=hotel_id)
+        await session.commit()
     return {'status': 'Succesfully modified'}
 
 
@@ -69,3 +60,10 @@ def patch_hotel(hotel_id: int, hotel_data: HotelPATCH):
             hotel['name'] = hotel_data.name if hotel_data.name != None else hotel['name']
     return {'status': 'Successfully modified'}
             
+
+@router.delete('/{hotel_id}')
+async def delete_hotel(hotel_id: int):
+    async with async_session() as session:
+        await HotelRepository(session).delete(id=hotel_id)
+        await session.commit()
+    return {'status': 'OK'}
