@@ -1,11 +1,8 @@
 from fastapi import Query, Body, APIRouter
 
-from sqlalchemy import insert, select, func
-
 from schemas.hotels import Hotel, HotelPATCH
 from src.api.dependencies import PaginationDep
 from src.database import async_session
-from src.models.hotels import HotelsOrm
 from src.database import engine
 from src.repositories.hotels import HotelRepository 
 
@@ -52,12 +49,10 @@ async def put_hotel(hotel_id: int, hotel_data: Hotel):
 @router.patch('/{hotel_id}') 
 # Can add attribute summary and description, 
 # change name of endpoint and give description 
-def patch_hotel(hotel_id: int, hotel_data: HotelPATCH):
-    global hotels
-    for hotel in hotels:
-        if hotel['id'] == hotel_id:
-            hotel['city'] = hotel_data.city if hotel_data.city != None else hotel['city']
-            hotel['name'] = hotel_data.name if hotel_data.name != None else hotel['name']
+async def patch_hotel(hotel_id: int, hotel_data: HotelPATCH):
+    async with async_session() as session:
+        await HotelRepository(session).edit(hotel_data, is_patch=True, id=hotel_id)
+        await session.commit()
     return {'status': 'Successfully modified'}
             
 
