@@ -1,9 +1,16 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
-class Hotel(BaseModel):
+class HotelAdd(BaseModel):
     city: str
     name: str
+
+
+class Hotel(HotelAdd):
+    id: int
+
+    # Can use this if we don't wanna duplicate code, but prefer to write it in BaseRepository
+    # model_config = ConfigDict(from_attributes=True)
 
 
 class HotelPATCH(BaseModel):
