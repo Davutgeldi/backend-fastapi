@@ -23,6 +23,15 @@ class User(BaseModel):
     id: int
     first_name: str
     last_name: str
-    phone: str
+    patronymic: str | None = None 
     email: EmailStr
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class UserHashedPassword(User):
+    hashed_password: str
 
