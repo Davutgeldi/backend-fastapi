@@ -1,11 +1,11 @@
-from fastapi import APIRouter, HTTPException, Response, Request
+from fastapi import APIRouter, HTTPException, Response
 
-from passlib.context import CryptContext 
 
 from src.database import async_session
 from src.schemas.users import UserRequestAdd, UserAdd, UserLogin
 from src.repositories.users import UsersRepository
 from src.services.auth import AuthService
+from src.api.dependencies import UserIdDep
 
 
 router = APIRouter(prefix="/auth", tags=["Authentication & Authorization"])
@@ -46,10 +46,16 @@ async def login_user(
         return {"access_token": access_token}
     
 
-@router.get("/token")
-async def get_cookie(
-    request: Request,
+@router.get("/me")
+async def get_me(
+    user_id: UserIdDep,
 ):
     async with async_session() as session:
-        cookie = request.cookies.get("access_token")
-        return {"cookie": cookie}
+        user = await UsersRepository(session).get_one_or_none(id=user_id)
+        return user
+    
+@router.post("/logout")
+async def logout_user(response: Response):
+    async with async_session() as session:
+        response.delete_cookie("access_token")
+        return {"status": "Logout completed"}
