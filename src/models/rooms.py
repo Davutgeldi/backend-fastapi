@@ -10,6 +10,6 @@ class RoomsOrm(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     hotel_id: Mapped[int] = mapped_column(ForeignKey('Hotels.id'))
     name: Mapped[str] = mapped_column(String(50))
-    description: Mapped[str | None]
-    price: Mapped[int]
+    description: Mapped[str | None] = mapped_column(String, nullable=True)
+    price: Mapped[float]
     quantity: Mapped[int]

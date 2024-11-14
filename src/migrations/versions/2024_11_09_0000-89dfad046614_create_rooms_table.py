@@ -1,8 +1,8 @@
-"""added rooms
+"""create rooms table
 
-Revision ID: 28ef4b9b014e
+Revision ID: 89dfad046614
 Revises: 23ca13ae6867
-Create Date: 2024-09-26 13:09:16.673979
+Create Date: 2024-11-09 00:00:25.006570
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "28ef4b9b014e"
+revision: str = "89dfad046614"
 down_revision: Union[str, None] = "23ca13ae6867"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
