@@ -1,9 +1,8 @@
 from fastapi import Query, Body, APIRouter
 
-from schemas.hotels import HotelAdd, HotelPATCH
+from schemas.hotels import HotelAdd, HotelPatch
 from src.api.dependencies import PaginationDep
 from src.database import async_session
-from src.database import engine
 from src.repositories.hotels import HotelRepository 
 
 router = APIRouter(prefix='/hotels', tags=['Hotels'])
@@ -55,7 +54,7 @@ async def update_hotel(hotel_id: int, hotel_data: HotelAdd):
 @router.patch('/{hotel_id}') 
 # Can add attribute summary and description, 
 # change name of endpoint and give description 
-async def edit_hotel(hotel_id: int, hotel_data: HotelPATCH):
+async def edit_hotel(hotel_id: int, hotel_data: HotelPatch):
     async with async_session() as session:
         await HotelRepository(session).edit(hotel_data, is_patch=True, id=hotel_id)
         await session.commit()
