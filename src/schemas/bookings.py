@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from datetime import date
+from datetime import date, datetime
 
 
 class BookingsAdd(BaseModel):
@@ -11,8 +11,14 @@ class BookingsAdd(BaseModel):
     price: float
 
 
-class Bookings(BookingsAdd):
+class Bookings(BaseModel):
     id: int
+    room_id: int
+    user_id: int
+    date_from: date
+    date_to: date
+    created_at: datetime
+    price: float
     
 
 class BookingsAddRequest(BaseModel):
