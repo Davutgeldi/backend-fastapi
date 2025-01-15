@@ -21,7 +21,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     op.create_table(
-        "Hotels",
+        "hotels",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("city", sa.String(length=50), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
@@ -30,4 +30,4 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_table("Hotels")
+    op.drop_table("hotels")

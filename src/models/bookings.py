@@ -9,7 +9,7 @@ from src.database import BaseModel
 
 
 class BookingsOrm(BaseModel):
-    __tablename__ = "Booking"
+    __tablename__ = "booking"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     room_id: Mapped[int] = mapped_column(ForeignKey("Rooms.id"))

@@ -5,7 +5,7 @@ from src.database import BaseModel
 
 
 class RoomsOrm(BaseModel):
-    __tablename__ = 'Rooms'
+    __tablename__ = "rooms"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     hotel_id: Mapped[int] = mapped_column(ForeignKey('Hotels.id'))

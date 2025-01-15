@@ -35,4 +35,3 @@ async def get_bookings(
    booking = await db.bookings.add(_booking_data)
    await db.commit()
    return {"status": "Succesfully posted", "data": booking}
-
