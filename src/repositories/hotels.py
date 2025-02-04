@@ -1,22 +1,35 @@
+from datetime import date
+
 from sqlalchemy import select, func
 
 from repositories.base import BaseRepository
 from src.models.hotels import HotelsOrm
 from src.schemas.hotels import Hotel
+from src.models.rooms import RoomsOrm
+from src.repositories.utils import rooms_id_for_booking
 
 
 class HotelRepository(BaseRepository):
     model = HotelsOrm
     schema = Hotel
 
-    async def get_all(
+    async def get_filtered_by_time(
             self, 
-            city,
-            name, 
-            limit, 
-            offset
+            date_from: date, 
+            date_to: date,
+            city: str,
+            name: str, 
+            limit: int, 
+            offset: int,
         ) -> list[Hotel]:
-        query = select(HotelsOrm)
+        rooms_id_to_get = rooms_id_for_booking(date_from=date_from, date_to=date_to)
+        hotels_id_to_get = (
+            select(RoomsOrm.hotel_id)
+            .select_from(RoomsOrm)
+            .filter(RoomsOrm.id.in_(rooms_id_to_get))
+        )   
+
+        query = select(HotelsOrm).filter(HotelsOrm.id.in_(hotels_id_to_get))
         if city:
             query = query.filter(func.lower(HotelsOrm.city).contains(city.lower()))
         if name:
@@ -26,8 +39,7 @@ class HotelRepository(BaseRepository):
             .limit(limit)
             .offset(offset)
         )
-        print(query.compile(compile_kwargs={'literal_binds': True}))
         result = await self.session.execute(query)
 
         return [self.schema.model_validate(model, from_attributes=True) for model in result.scalars().all()]
-    
+         
