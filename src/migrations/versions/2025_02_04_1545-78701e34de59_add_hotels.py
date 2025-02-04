@@ -1,8 +1,8 @@
-"""initial migration
+"""add hotels
 
-Revision ID: 23ca13ae6867
+Revision ID: 78701e34de59
 Revises: 
-Create Date: 2024-09-26 13:07:32.591958
+Create Date: 2025-02-04 15:45:58.246167
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "23ca13ae6867"
+revision: str = "78701e34de59"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
