@@ -2,11 +2,11 @@ from datetime import date
 
 from fastapi import Query, Body, APIRouter
 
-from schemas.hotels import HotelAdd, HotelPatch
+from src.schemas.hotels import HotelAdd, HotelPatch
 from src.api.dependencies import PaginationDep, DBDep
 
 
-router = APIRouter(prefix='/hotels', tags=['Hotels'])
+router = APIRouter(prefix="/hotels", tags=["Hotels"])
 
 
 @router.get("", summary="Get query", 
