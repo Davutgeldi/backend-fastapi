@@ -4,6 +4,7 @@ from fastapi import APIRouter, Body, HTTPException, Query
 
 from src.api.dependencies import DBDep
 from src.schemas.rooms import RoomAdd, RoomPatch, RoomAddRequest, RoomPatchRequest
+from src.schemas.facility import RoomsFacilitiesAdd
 
 
 router = APIRouter(prefix="/hotels", tags=["Rooms"])
@@ -28,30 +29,18 @@ async def get_rooms_by_id(
 
 
 @router.post("/{hotel_id}/rooms")
-async def add_hotel_room(hotel_id: int, db: DBDep, room_data: RoomAddRequest = Body(openapi_examples={
-    "1": {
-        "summary": "Example 1", "value": {
-            "name": "VIP", 
-            "description":"VIP room for special guess",
-            "price": 30,
-            "quantity": 5
-        }},
-    "2":{
-        "summary": "Example 2", "value":{
-            "name": "VIP", 
-            "description":"VIP room for celebrities",
-            "price": 120,
-            "quantity": 2
-        }
-    }
-})
+async def add_hotel_room(hotel_id: int, db: DBDep, room_data: RoomAddRequest = Body()
     ):
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     hotel = await db.hotels.get_one_or_none(id=hotel_id)
     if not hotel:
         raise HTTPException(status_code=404, detail="Hotel doesn't exists")
     room = await db.rooms.add(_room_data)
+    
+    rooms_facilities_data = [RoomsFacilitiesAdd(room_id=room.id, facility_id=f_id) for f_id in room_data.facilities_id]
+    await db.rooms_facilities.add_bulk(rooms_facilities_data)
     await db.commit()
+
     return {"status": "Succesfully posted", "data": room}
 
 

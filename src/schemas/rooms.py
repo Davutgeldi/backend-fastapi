@@ -18,6 +18,7 @@ class RoomAddRequest(BaseModel):
     description: str | None = None
     price: float
     quantity: int
+    facilities_id: list[int] | None = None
 
 
 class RoomPatch(BaseModel):
