@@ -18,7 +18,7 @@ class RoomAddRequest(BaseModel):
     description: str | None = None
     price: float
     quantity: int
-    facilities_id: list[int] | None = None
+    facilities_idsf: list[int] = []
 
 
 class RoomPatch(BaseModel):
@@ -34,3 +34,4 @@ class RoomPatchRequest(BaseModel):
     description: str | None = None
     price: float | None = None
     quantity: int | None = None
+    facilities_ids: list[int] = []

@@ -22,9 +22,6 @@ async def get_rooms_by_id(
     date_from: date = Query(example="2024-07-05"), 
     date_to: date = Query(example="2024-07-01"),
 ):
-    hotel = await db.hotels.get_one_or_none(id=hotel_id)
-    if not hotel:
-        raise HTTPException(status_code=401, detail="Hotel doesn't exists")
     return await db.rooms.get_filterd_by_time(date_from=date_from, date_to=date_to, hotel_id=hotel_id)
 
 
@@ -32,12 +29,9 @@ async def get_rooms_by_id(
 async def add_hotel_room(hotel_id: int, db: DBDep, room_data: RoomAddRequest = Body()
     ):
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
-    hotel = await db.hotels.get_one_or_none(id=hotel_id)
-    if not hotel:
-        raise HTTPException(status_code=404, detail="Hotel doesn't exists")
     room = await db.rooms.add(_room_data)
     
-    rooms_facilities_data = [RoomsFacilitiesAdd(room_id=room.id, facility_id=f_id) for f_id in room_data.facilities_id]
+    rooms_facilities_data = [RoomsFacilitiesAdd(room_id=room.id, facility_id=f_id) for f_id in room_data.facilities_ids]
     await db.rooms_facilities.add_bulk(rooms_facilities_data)
     await db.commit()
 
@@ -47,21 +41,20 @@ async def add_hotel_room(hotel_id: int, db: DBDep, room_data: RoomAddRequest = B
 @router.put("/{hotel_id}/room/{room_id}")
 async def update_room(hotel_id: int, room_id: int, room_data: RoomAddRequest, db: DBDep):
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
-    hotel = await db.hotels.get_one_or_none(id=hotel_id)
-    if not hotel:
-        raise HTTPException(status_code=404, detail="Hotel doesn't exists")
     await db.rooms.edit(_room_data, id=room_id)
+    await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=room_data.facilities_ids)
     await db.commit()
     return {"status": "Succesfully modified"}
 
 
 @router.patch("/{hotel_id}/room/{room_id}")
 async def edit_room(hotel_id: int, room_id: int, room_data: RoomPatchRequest, db: DBDep):
-    _room_data = RoomPatch(hotel_id=hotel_id, **room_data.model_dump(exclude_unset=True))
-    hotel = await db.hotels.get_one_or_none(id=hotel_id)
-    if not hotel:
-        raise HTTPException(status_code=404, detail="Hotel doesn't exists")
+    _room_data_dict = room_data.model_dump(exclude_unset=True)
+    _room_data = RoomPatch(hotel_id=hotel_id, **_room_data_dict)
     await db.rooms.edit(_room_data, is_patch=True, hotel_id=hotel_id, id=room_id)
+
+    if "facilities_ids" in _room_data_dict:
+        await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=_room_data_dict["facilities_ids"])      
     await db.commit()
     return {"status": "Succesfully modified"}
 
