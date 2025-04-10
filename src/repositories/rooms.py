@@ -5,13 +5,13 @@ from sqlalchemy.orm import selectinload, joinedload
 
 from src.repositories.base import BaseRepository
 from src.models.rooms import RoomsOrm
-from src.schemas.rooms import Room, RoomsWithRels
 from src.repositories.utils import rooms_id_for_booking
+from src.repositories.mappers.mappers import RoomDataMapper, RoomDataWithRelsMapper
 
 
 class RoomRepository(BaseRepository):
     model = RoomsOrm
-    schema = Room
+    mapper = RoomDataMapper
 
 
     async def get_filtered_by_time(
@@ -28,7 +28,7 @@ class RoomRepository(BaseRepository):
             .filter(RoomsOrm.id.in_(rooms_id_to_get))
         )
         result = await self.session.execute(query)
-        return [RoomsWithRels.model_validate(model, from_attributes=True) for model in result.scalars().all()]
+        return [RoomDataWithRelsMapper.map_to_domain_entity(model) for model in result.scalars().all()]
 
 
     async def get_one_room(
@@ -45,4 +45,5 @@ class RoomRepository(BaseRepository):
             )
         )
         result = await self.session.execute(query)
-        return RoomsWithRels.model_validate(result.scalars().first(), from_attributes=True)
+        room = result.scalars().first()
+        return RoomDataWithRelsMapper.map_to_domain_entity(room)

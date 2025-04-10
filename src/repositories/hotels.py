@@ -7,11 +7,12 @@ from src.models.hotels import HotelsOrm
 from src.schemas.hotels import Hotel
 from src.models.rooms import RoomsOrm
 from src.repositories.utils import rooms_id_for_booking
+from src.repositories.mappers.mappers import HotelDataMapper
 
 
 class HotelRepository(BaseRepository):
     model = HotelsOrm
-    schema = Hotel
+    mapper = HotelDataMapper
 
     async def get_filtered_by_time(
             self, 
@@ -41,5 +42,5 @@ class HotelRepository(BaseRepository):
         )
         result = await self.session.execute(query)
 
-        return [self.schema.model_validate(model, from_attributes=True) for model in result.scalars().all()]
+        return [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
          

@@ -22,7 +22,7 @@ async def get_rooms_by_id(
     date_from: date = Query(example="2024-07-05"), 
     date_to: date = Query(example="2024-07-01"),
 ):
-    return await db.rooms.get_filtered_by_time(date_from=date_from, date_to=date_to, hotel_id=hotel_id)
+    return await db.rooms.get_filtered_by_time(date_from=date_from, date_to=date_to, hotel_id=hotel_id) 
 
 
 @router.get("/hotels/{hotel_id}/rooms/{room_id}")
