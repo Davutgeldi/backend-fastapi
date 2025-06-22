@@ -19,11 +19,9 @@ class Bookings(BaseModel):
     date_to: date
     created_at: datetime
     price: float
-    
+
 
 class BookingsAddRequest(BaseModel):
     date_from: date
     date_to: date
     room_id: int
-
-

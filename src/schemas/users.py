@@ -23,7 +23,7 @@ class User(BaseModel):
     id: int
     first_name: str
     last_name: str
-    patronymic: str | None = None 
+    patronymic: str | None = None
     email: EmailStr
 
 
@@ -34,4 +34,3 @@ class UserLogin(BaseModel):
 
 class UserHashedPassword(User):
     hashed_password: str
-

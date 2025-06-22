@@ -12,11 +12,11 @@ class RoomAdd(BaseModel):
 
 
 class Room(RoomAdd):
-   id: int
+    id: int
 
 
 class RoomsWithRels(Room):
-    facilities: list[Facility]   
+    facilities: list[Facility]
 
 
 class RoomAddRequest(BaseModel):

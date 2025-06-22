@@ -3,7 +3,7 @@ import pytest
 from src.main import app
 from src.config import settings
 from src.database import BaseModel, engine_null_pool
-from src.models import *
+from src.models import * # noqa
 
 from httpx import AsyncClient
 

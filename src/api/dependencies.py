@@ -7,12 +7,13 @@ from src.services.auth import AuthService
 from src.utils.db_manager import DBManager
 from src.database import async_session
 
+
 class PaginationParams(BaseModel):
     page: Annotated[int | None, Query(1, ge=1)]
     per_page: Annotated[int | None, Query(None, ge=1, lt=15)]
 
 
-PaginationDep = Annotated[PaginationParams, Depends()] 
+PaginationDep = Annotated[PaginationParams, Depends()]
 
 
 def get_token(request: Request) -> str:
